@@ -83,6 +83,9 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
     @Parameter
     private int defaultStartLevel = 80;
 
+    @Parameter(defaultValue = "true")
+    private boolean useOriginalRepo;
+
     /**
      * Internal counter for garbage collection
      */
@@ -149,9 +152,12 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
             if (artifact == null) {
                 return;
             }
-            List<ArtifactRepository> usedRemoteRepos = artifact.getRepository() != null ? 
+            List<ArtifactRepository> usedRemoteRepos = Collections.emptyList();
+            if (useOriginalRepo) {
+              usedRemoteRepos = artifact.getRepository() != null ? 
                     Collections.singletonList(artifact.getRepository())
                     : remoteRepos;
+            }
             artifactResolver.resolve(artifact, usedRemoteRepos, localRepo);
         } catch (Exception e) {
             if (failOnArtifactResolutionError) {
